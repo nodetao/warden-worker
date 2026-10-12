@@ -25,7 +25,7 @@ tag = "do_v2"
 new_sqlite_classes = ["NotifyDo"]
 
 [build]
-command = "cargo install --locked -q worker-build --version 0.8.5 && worker-build --release --locked"
+command = "bash scripts/cloudflare-build.sh"
 
 # Rate limiting configuration for protecting sensitive endpoints
 # See: https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
@@ -53,10 +53,18 @@ html_handling = "auto-trailing-slash"
 # Only invoke Worker for API and Identity routes, serve static files directly for other routes
 run_worker_first = ["/api/*", "/identity/*", "/notifications/*"]
 
+# Custom domain for the Web Vault and Bitwarden clients.
+routes = [
+  { pattern = "vault.momoit.xyz", custom_domain = true }
+]
+
 [vars]
 # Base URL for the worker, used for generating up/down URLs for files.
 # If not set, the base URL will be extracted from the incoming request.
-# BASE_URL = "https://vault.example.com"
+BASE_URL = "https://vault.momoit.xyz"
+
+# Allow the first account to be created from the Web Vault.
+DISABLE_USER_REGISTRATION = "false"
 
 # Server-side password hashing PBKDF2 iterations (stored per-user).
 # Defaults to 600000, and will be clamped to a minimum of 600000 even if set lower.
@@ -111,7 +119,7 @@ crons = ["0 3 * * *"]
 [[d1_databases]]
 binding = "vault1"
 database_name = "vault1"
-database_id = "${D1_DATABASE_ID}"
+database_id = "1f1d436b-1bbe-433b-b9ad-f6bce4842180"
 migrations_dir = "migrations"
 
 # R2 bucket for file attachments (optional, requires credit card)
@@ -127,6 +135,7 @@ migrations_dir = "migrations"
 # If R2 is not configured, KV will be used for attachments.
 [[kv_namespaces]]
 binding = "ATTACHMENTS_KV"
+id = "1e8671cb2c624e0cadabe0208cabc7ae"
 
 [env.dev]
 name = "warden-worker-dev"

@@ -1,4 +1,5 @@
 target
+target-install
 node_modules
 .wrangler
 .env
